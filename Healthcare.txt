@@ -1,0 +1,129 @@
+1.(give any activity as default activity)
+for change the default activity ,go to the manifest and their change the default activity ,by changing the 
+mainactivity as activity_name you want  to give and remove the activity of the give activity which already exist.
+
+2.(for giving the plaintext as password )
+go to the activity.xml file and their in editText change inputType as textPassword,now the input given is in
+ Passoword form.
+
+3.(for remove the actionbar)
+go to the theme.xml file in that change style name -> parent-> NoActionBar in place of DarkActionBar.
+
+
+(IMPORTANT)4.(for going to new page)
+for going to different activity from one activity we use the Intent(two type Implicit and Explicit)
+in any onclickListener ,
+syntax->
+        startActivity(new Intent(this_activity.this,going_activitY.class) )
+
+
+(IMPORTANT)5.(for contacting from the database).
+step a: create the new java class.
+step b: extends class with SQLiteOpeinHelper class.
+step c: implement automatic methods and create construtor(by using autocollect and error removing)
+step d: create query to create table in the onCreate method(query given below)
+        
+        String query="create table user(username text,email text,password text)";
+        sqLiteDatabase.execSQL(query);
+
+step e: create a register method(passing all argument in it )
+        create the contentValues object(This class is used to store a set of values that the ContentResolver can process)
+        then insert the value in the table database.
+step f: go in the registerActivity creating database here
+
+           Database db=new Database(getApplicationContext(),"healthcare",null,1);
+              
+           then call db.register() when all validation is done.    
+
+with these above steps we can create and insert value in the  database successfully.
+ 
+
+6.(for checking  username and password is match with data in database or not)
+
+    int result=0;
+        String str[]=new String[2];
+        str[0]=username;
+        str[1]=password;
+        SQLiteDatabase db=getReadableDatabase();
+        Cursor c=db.rawQuery("select * from user where username=? and password=?",str);
+        if(c.moveToFirst()){
+            result+=1;
+        }
+        return result;
+
+7.(for database creation )
+   
+   first we have to create a class ,which extends SQLiteOpenHelper,in this class we have to define three 
+   methods (database,Oncreate,Onupgrade)
+
+   a. In the Oncreate method we have create query which create the database
+                 
+           String query1="create table cart(username type,product text,price float,otype text)";
+        sqLiteDatabase.execSQL(query1);
+
+   b.then  we have create the other method outside above three method(with passing the required parameter in it) for 
+     register the data or put data in the database.
+
+            ContentValues cv = new ContentValues();
+            cv.put("username", username);
+            SQLiteDatabase db = getReadableDatabase();
+            db.insert("user", null, cv);
+            db.close();
+
+
+8.(for checking the data present in the database or not)
+     
+    create the method passing the required parameter in that
+    then create the array ,store the parameter in that array
+    then write a query using cursor given below:
+
+
+        String str[]=new String[2];
+        str[0]=username;
+        str[1]=password;
+        SQLiteDatabase db=getReadableDatabase();
+        Cursor c=db.rawQuery("select * from user where username=? and password=?",str);
+        if(c.moveToFirst()){
+            result+=1;
+        }
+        return result;
+
+9. (how to retrieve the data from the database)
+    
+   a.first  use  the sharedpreference sp and use predefined method getsharedPreference
+      then define username string to store username in it.
+      then define the database and create a arraylist and call a getCardData method by passing two parameter
+      username,lab.
+
+      SharedPreferences sp=getSharedPreferences("shared_prefs", Context.MODE_PRIVATE);
+        String username=sp.getString("username","").toString();
+
+        Database db=new Database(getApplicationContext(),"healthcare",null,1);
+
+        //float totalAmount=0;
+        ArrayList dbData=db.getCardData(username,"lab");
+
+        Toast.makeText(getApplicationContext(), ""+dbData   , Toast.LENGTH_SHORT).show();
+    
+
+
+    b.getCardData function()
+
+
+                   ArrayList<String> arr=new ArrayList<>();
+        SQLiteDatabase db=getReadableDatabase();
+        String str[]=new String[2];
+        str[0]=username;
+        str[1]=otype;
+        Cursor c=db.rawQuery("select * from cart where username=? and otype=?",str);
+        if(c.moveToFirst()){
+            do{
+                String product=c.getString(1);
+                String price=c.getString(2);
+                arr.add(product+"$"+price);
+
+
+            }while (c.moveToNext());
+        }
+        db.close();
+        return arr;
